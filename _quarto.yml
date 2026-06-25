@@ -1,0 +1,22 @@
+project:
+  type: website
+
+website:
+  title: "MPP"
+
+format:
+  html:
+    theme:
+      - cosmo
+      - brand
+    css: styles.css
+    toc: true
+    toc-location: left
+    toc-title: "Choix de la ligue"
+    page-layout: full
+
+editor: visual
+
+execute:
+  fig-width: 12
+  fig-height: 15

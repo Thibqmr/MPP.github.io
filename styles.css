@@ -1,0 +1,21 @@
+#quarto-content.page-layout-full {
+  display: flex !important;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+#quarto-sidebar {
+  flex: 0 0 200px;
+  position: sticky;
+  top: 0;
+}
+
+#quarto-margin-sidebar {
+  display: none !important;
+}
+
+main#quarto-document-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 8em;
+}

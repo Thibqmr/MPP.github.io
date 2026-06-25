@@ -1,0 +1,329 @@
+---
+title: "MPP"
+toc: true
+toc-location: left
+---
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+library(httr2)
+library(tidyverse)
+library(plotly)
+library(kableExtra)
+
+
+token <- "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IllOb0d0ZVg5VVV1THh5WFJTOF9QRSJ9.eyJzaWduSW5UeXBlIjoic2lnbmVkSW4iLCJ1c2VySWQiOiJ1c2VyX2I1ZmUzZTFiLTBmNTctNDFiYS1iNGJlLWFjYjI3M2FlYjY0NSIsImluaXRpYWxBdXRoMElkIjoiZ29vZ2xlLW9hdXRoMnwxMDUzNTk2MzI3NDU2NjEyMzc5MTciLCJodHRwczovL2Nvbm5lY3QubGlndWUxLmZyL2NsaWVudF9uYW1lIjoiTVBQIFdlYiIsImNvbm5lY3Rpb25UeXBlIjoiZ29vZ2xlLW9hdXRoMiIsImh0dHBzOi8vY29ubmVjdC5saWd1ZTEuZnIvY29ubmVjdGlvbiI6Imdvb2dsZS1vYXV0aDIiLCJodHRwczovL2Nvbm5lY3QubGlndWUxLmZyL29yaWdpbiI6Im1wcC5mb290YmFsbCIsImh0dHBzOi8vY29ubmVjdC5saWd1ZTEuZnIvZHNwX2NsaWVudF9pZCI6Im1wcCIsImFwcElkIjoibXBwIiwiaHR0cHM6Ly9jb25uZWN0LmxpZ3VlMS5mci9jdXN0b21pemF0aW9uIjoiYmFja2dyb3VuZD1odHRwcyUzQSUyRiUyRnByb2ZpbGUubGlndWUxLmZyJTJGc3RhdGljLWFzc2V0cyUyRkltYWdlcyUyRmJnJTJGQkctTVBQLmpwZyZsb2dvPWh0dHBzJTNBJTJGJTJGczMuZXUtd2VzdC0zLmFtYXpvbmF3cy5jb20lMkZsaWd1ZTEuaW1hZ2UlMkZzc28lMkZsb2dvX21wcC5wbmcmZm9udD1odHRwcyUzQSUyRiUyRnByb2ZpbGUubGlndWUxLmZyJTJGc3RhdGljLWFzc2V0cyUyRmZvbnRzJTJGQXZlbmlyLndvZmYyJmZvbnRTZWNvbmRhcnk9aHR0cHMlM0ElMkYlMkZwcm9maWxlLmxpZ3VlMS5mciUyRnN0YXRpYy1hc3NldHMlMkZmb250cyUyRkZ1dHVyYS53b2ZmMiZhbXBsaXR1ZGU9NDIwOWRhNDE2MzI5NjA0ZTM2ZjUxZWJjYTBmMTRhMzAmdGhlbWU9ZGFyayZwcmltYXJ5Q29sb3I9JTIzMDg1RkZGJnNlY29uZGFyeUNvbG9yPSUyM0ZGN0ZERSZidXR0b25Db2xvcj0lMjNGRkZGRkYmZm9jdXNDb2xvcj0lMjMwODVGRkYmdGV4dENvbG9yPSUyM0E3QTZBMSZ0ZXh0Q29sb3JGaWxsZWQ9JTIzRkVGMUZCJndpZGdldEJhY2tncm91bmRDb2xvcj0lMjMxNjE2MTYmc29jaWFsQmFja2dyb3VuZENvbG9yPSUyMzI2MjYyNCZzZWxlY3RCYWNrZ3JvdW5kQ29sb3I9JTIzNDQ0NDQxIiwiaXNzIjoiaHR0cHM6Ly9jb25uZWN0LmxpZ3VlMS5mci8iLCJzdWIiOiJnb29nbGUtb2F1dGgyfDEwNTM1OTYzMjc0NTY2MTIzNzkxNyIsImF1ZCI6WyJodHRwczovL21wcC5saWd1ZTEuZnIiLCJodHRwczovL2xmcC1teWxpZ3VlLmV1LmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE3ODIxMjkxMTAsImV4cCI6MTc4NDcyMTExMCwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCBvZmZsaW5lX2FjY2VzcyIsImF6cCI6ImdyWDVqV0dXV1E0VXE5MW9lN0tQTkRaOTZGUzNqcjBYIiwicGVybWlzc2lvbnMiOltdfQ.aPJP8W_CJAxbbFkrvZCCYTicHMTa_Q8JDqkI5IIlCjQHrxRYrOKKc_9MPAXNYcBqaQdSuzk_N3eDEA1xGYvQzVDxRK91w1YGdK3h4AJiNjDlcn69UzG_JbiA5YWpj6w9uWDNipjah3NTbnFJHGB6v-8U9z0TzXDID47XeFOyK7b4KngswFqIaCWd2XKDkcPTHXqgTcX4AadP-9YKldzlSJQG-jkx9Cd4OewtZT2u0J_l4KVkDF_UxVFtK0Cqu3qDpJrSZ3eS_nn7RwAbZbZq-w__I5hUPcJX99N5cXFYJjemGjDPLweqb2-KA82J0NPlxAjW11_ZzMhKd0OH9zdkDA"  # ton token complet
+
+fetch_history <- function(before_date = NULL, id_user = "10796256") {
+  url <- paste0("https://api.mpp.football/user-match-forecasts/championship/8/history?userId=user_", id_user, "&limitDays=3")
+  if (!is.null(before_date)) url <- paste0(url, "&beforeDate=", before_date)
+  
+  request(url) |>
+    req_headers(
+      "Authorization"   = paste("Bearer", token),
+      "app-context"     = "internationalEvent",
+      "application"     = "mppLfp",
+      "client-language" = "fr-FR",
+      "client-version"  = "11.12.0",
+      "platform"        = "web",
+      "Origin"          = "https://mpp.football",
+      "Referer"         = "https://mpp.football/"
+    ) |>
+    req_perform() |>
+    resp_body_json(simplifyVector = TRUE)
+}
+
+
+donnees <- list(
+  "Thibaud" = "10796256",
+  "Maël" = "2882159",
+  "Eric" = "11705902",
+  "Eno" = "11692701",
+  "Marianne" = "11774379",
+  "Toutoune" = "10838387",
+  "Quentin" = "10782715",
+  "Sam" = "11642865",
+  "Benou" = "6183861",
+  "Polo" = "11097863"
+) %>%
+  map(~ seq(as.Date("2026-06-11"), Sys.Date(), by = "day") |>
+        map(fetch_history, id_user = .x) |>
+        map(pluck, "matchesByDate") |>
+        list_flatten()
+  ) %>%
+  map(
+    ~ .x[!duplicated(names(.x))] |>
+      (\(x) x[sort(names(x))])()
+  ) %>%
+  imap(\(x, idx)
+       x %>% bind_rows() %>%
+         transmute(id_match = str_remove_all(pattern = "mpp_championship_match_", string = matchId), date = ymd_hms(date), points = points$total) %>%
+         mutate(total = cumsum(points)) %>% mutate(Nom = idx, .before = 1)
+  ) %>% bind_rows() %>% as_tibble()
+
+```
+
+# Toutes ligues confondues
+
+## Evolution du nombre de point par joueur
+
+```{r}
+#| echo: false 
+ggplotly(
+  donnees %>%
+    ggplot(aes(
+      x = date,
+      y = total,
+      colour = Nom,
+      group = Nom,
+      text = paste0(Nom, "<br>Date : ", format(date, "%d %b"), "<br>Total : ", total)
+    )) +            geom_point() + geom_line() +            scale_x_datetime(date_labels = "%d %b", date_breaks = "1 day"),
+  tooltip = "text"
+) %>% layout(autosize = TRUE)
+```
+
+```{r}
+#| echo: false 
+medailles <- c("🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟") 
+donnees %>%   mutate_at("date", as.Date) %>%   group_by(Nom, date) %>%   
+  summarize(total = max(total), .groups = "drop") %>%   
+  pivot_wider(names_from = date, values_from = total) %>%   
+  arrange(desc(pick(last_col()))) %>%    
+  mutate(across(-Nom, ~
+                  {
+                    rangs <- dense_rank(desc(replace_na(.x, -Inf)))
+                    ifelse(is.na(.x), NA_character_, paste(medailles[rangs], .x))
+                  })) %>%   
+  kbl(escape = FALSE, align = "c", row.names = FALSE) %>%   
+  kable_styling("striped", full_width = TRUE)
+```
+
+## Evolution de l'écart de point
+
+```{r}
+#| echo: false 
+ggplotly(donnees %>% group_by(Nom, id_match, date) %>%
+           full_join(donnees %>% filter(Nom == "Thibaud") %>% transmute(id_match, date, mon_total = total), by = join_by(id_match, date)) %>%
+           mutate(diff = mon_total - total) %>% ungroup() %>% filter(Nom != "Thibaud") %>%
+           ggplot(aes(x = date, y = diff, colour = Nom, group = Nom,
+                      text = paste0(Nom, "<br>Date : ", format(date, "%d %b"), "<br>Total : ", total, "<br>Différence : ", diff))) +
+           geom_hline(yintercept = 0, color = "darkgrey", linetype = "dashed") +
+           geom_point() +
+           geom_line() + ylab("différence de points") +
+           scale_x_datetime(date_labels = "%d %b", date_breaks = "1 day"), tooltip = "text") %>% layout(autosize = TRUE)
+```
+
+```{r}
+#| echo: false 
+df <- donnees %>%
+  group_by(Nom, id_match, date) %>%
+  full_join(donnees %>% filter(Nom == "Thibaud") %>% transmute(id_match, date, mon_total = total), by = join_by(id_match, date)) %>%
+  mutate(diff = mon_total - total) %>% ungroup() %>% filter(Nom != "Thibaud") %>%
+  mutate_at("date", as.Date) %>%
+  group_by(Nom, date) %>%
+  summarize(diff = last(diff), .groups = "drop") %>%
+  pivot_wider(names_from = date, values_from = diff) %>%
+  arrange(desc(pick(last_col())))
+
+date_cols <- setdiff(names(df), "Nom")
+
+df_num <- df  # copie des valeurs numériques
+
+for (i in seq_along(date_cols)) {
+  col      <- date_cols[i]
+  prev_col <- if (i > 1) date_cols[i - 1] else NULL
+  
+  fleche <- if (is.null(prev_col)) {
+    rep("", nrow(df))
+  } else {
+    case_when(
+      is.na(df_num[[col]])                        ~ "",
+      df_num[[col]] > df_num[[prev_col]]          ~ '<span style="color:green">▲</span>',
+      df_num[[col]] == df_num[[prev_col]]         ~ '<span style="color:purple">▶</span>',
+      df_num[[col]] < df_num[[prev_col]]          ~ '<span style="color:red">▼</span>'
+    )
+  }
+  df[[col]] <- ifelse(is.na(df_num[[col]]), NA_character_, paste(fleche, df_num[[col]]))
+}
+
+df %>%
+  kbl(escape = FALSE, align = "c", row.names = FALSE) %>%
+  kable_styling("striped", full_width = TRUE)
+
+```
+
+# Copains
+
+## Evolution du nombre de point par joueur
+
+```{r}
+#| echo: false  
+ggplotly(donnees %>% filter(Nom %in% c("Benou", "Polo", "Quentin", "Sam", "Thibaud", "Toutoune")) %>% 
+           ggplot(aes(x = date, y = total, colour = Nom, group = Nom,
+                      text = paste0(Nom, "<br>Date : ", format(date, "%d %b"), "<br>Total : ", total))) +
+           geom_point() + geom_line() +
+           scale_x_datetime(date_labels = "%d %b", date_breaks = "1 day"), tooltip = "text") %>% layout(autosize = TRUE)
+```
+
+```{r}
+#| echo: false  
+medailles <- c("🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣")
+donnees %>% 
+  filter(Nom %in% c("Benou", "Polo", "Quentin", "Sam", "Thibaud", "Toutoune")) %>% 
+  mutate_at("date", as.Date) %>%   group_by(Nom, date) %>%   
+  summarize(total = max(total), .groups = "drop") %>%   
+  pivot_wider(names_from = date, values_from = total) %>%   
+  arrange(desc(pick(last_col()))) %>%    
+  mutate(across(-Nom, ~
+                  {
+                    rangs <- dense_rank(desc(replace_na(.x, -Inf)))
+                    ifelse(is.na(.x), NA_character_, paste(medailles[rangs], .x))
+                  })) %>%   
+  kbl(escape = FALSE, align = "c", row.names = FALSE) %>%   
+  kable_styling("striped", full_width = TRUE)
+```
+
+## Evolution de l'écart de point
+
+```{r}
+#| echo: false  
+ggplotly(donnees %>% 
+           filter(Nom %in% c("Benou", "Polo", "Quentin", "Sam", "Thibaud", "Toutoune")) %>% 
+           group_by(Nom, id_match, date) %>%
+           full_join(donnees %>% filter(Nom == "Thibaud") %>% transmute(id_match, date, mon_total = total), by = join_by(id_match, date)) %>%
+           mutate(diff = mon_total - total) %>% ungroup() %>% filter(Nom != "Thibaud") %>%
+           ggplot(aes(x = date, y = diff, colour = Nom, group = Nom,
+                      text = paste0(Nom, "<br>Date : ", format(date, "%d %b"), "<br>Total : ", total, "<br>Différence : ", diff))) +
+           geom_hline(yintercept = 0, color = "darkgrey", linetype = "dashed") +
+           geom_point() +
+           geom_line() + ylab("différence de points") +
+           scale_x_datetime(date_labels = "%d %b", date_breaks = "1 day"), tooltip = "text") %>% layout(autosize = TRUE)
+```
+
+```{r}
+#| echo: false
+df <- donnees %>% 
+  filter(Nom %in% c("Benou", "Polo", "Quentin", "Sam", "Thibaud", "Toutoune")) %>%
+  group_by(Nom, id_match, date) %>%
+  full_join(donnees %>% filter(Nom == "Thibaud") %>% transmute(id_match, date, mon_total = total), by = join_by(id_match, date)) %>%
+  mutate(diff = mon_total - total) %>% ungroup() %>% filter(Nom != "Thibaud") %>%
+  mutate_at("date", as.Date) %>%
+  group_by(Nom, date) %>%
+  summarize(diff = last(diff), .groups = "drop") %>%
+  pivot_wider(names_from = date, values_from = diff) %>%
+  arrange(desc(pick(last_col())))
+
+date_cols <- setdiff(names(df), "Nom")
+
+df_num <- df  # copie des valeurs numériques
+
+for (i in seq_along(date_cols)) {
+  col      <- date_cols[i]
+  prev_col <- if (i > 1) date_cols[i - 1] else NULL
+  
+  fleche <- if (is.null(prev_col)) {
+    rep("", nrow(df))
+  } else {
+    case_when(
+      is.na(df_num[[col]])                        ~ "",
+      df_num[[col]] > df_num[[prev_col]]          ~ '<span style="color:green">▲</span>',
+      df_num[[col]] == df_num[[prev_col]]         ~ '<span style="color:purple">▶</span>',
+      df_num[[col]] < df_num[[prev_col]]          ~ '<span style="color:red">▼</span>'
+    )
+  }
+  df[[col]] <- ifelse(is.na(df_num[[col]]), NA_character_, paste(fleche, df_num[[col]]))
+}
+
+df %>%
+  kbl(escape = FALSE, align = "c", row.names = FALSE) %>%
+  kable_styling("striped", full_width = TRUE)
+```
+
+# Famille
+
+## Evolution du nombre de point par joueur
+
+```{r}
+#| echo: false   
+ggplotly(donnees %>% filter(Nom %in% c("Eno", "Eric", "Maël", "Marianne", "Thibaud")) %>% 
+           ggplot(aes(x = date, y = total, colour = Nom, group = Nom,
+                      text = paste0(Nom, "<br>Date : ", format(date, "%d %b"), "<br>Total : ", total))) +
+           geom_point() + geom_line() +
+           scale_x_datetime(date_labels = "%d %b", date_breaks = "1 day"), tooltip = "text") %>% layout(autosize = TRUE)
+```
+
+```{r}
+#| echo: false
+medailles <- c("🥇", "🥈", "🥉", "4️⃣", "5️⃣")
+donnees %>% 
+  filter(Nom %in% c("Eno", "Eric", "Maël", "Marianne", "Thibaud")) %>% 
+  mutate_at("date", as.Date) %>%   group_by(Nom, date) %>%   
+  summarize(total = max(total), .groups = "drop") %>%   
+  pivot_wider(names_from = date, values_from = total) %>%   
+  arrange(desc(pick(last_col()))) %>%    
+  mutate(across(-Nom, ~
+                  {
+                    rangs <- dense_rank(desc(replace_na(.x, -Inf)))
+                    ifelse(is.na(.x), NA_character_, paste(medailles[rangs], .x))
+                  })) %>%   
+  kbl(escape = FALSE, align = "c", row.names = FALSE) %>%   
+  kable_styling("striped", full_width = TRUE)
+```
+
+## Evolution de l'écart de point
+
+```{r}
+#| echo: false
+ggplotly(donnees %>% 
+           filter(Nom %in% c("Eno", "Eric", "Maël", "Marianne", "Thibaud")) %>% 
+           group_by(Nom, id_match, date) %>%
+           full_join(donnees %>% filter(Nom == "Thibaud") %>% transmute(id_match, date, mon_total = total), by = join_by(id_match, date)) %>%
+           mutate(diff = mon_total - total) %>% ungroup() %>% filter(Nom != "Thibaud") %>%
+           ggplot(aes(x = date, y = diff, colour = Nom, group = Nom,
+                      text = paste0(Nom, "<br>Date : ", format(date, "%d %b"), "<br>Total : ", total, "<br>Différence : ", diff))) +
+           geom_hline(yintercept = 0, color = "darkgrey", linetype = "dashed") +
+           geom_point() +
+           geom_line() + ylab("différence de points") +
+           scale_x_datetime(date_labels = "%d %b", date_breaks = "1 day"), tooltip = "text") %>% layout(autosize = TRUE)
+```
+
+```{r}
+#| echo: false
+df <- donnees %>% 
+  filter(Nom %in% c("Eno", "Eric", "Maël", "Marianne", "Thibaud")) %>%
+  group_by(Nom, id_match, date) %>%
+  full_join(donnees %>% filter(Nom == "Thibaud") %>% transmute(id_match, date, mon_total = total), by = join_by(id_match, date)) %>%
+  mutate(diff = mon_total - total) %>% ungroup() %>% filter(Nom != "Thibaud") %>%
+  mutate_at("date", as.Date) %>%
+  group_by(Nom, date) %>%
+  summarize(diff = last(diff), .groups = "drop") %>%
+  pivot_wider(names_from = date, values_from = diff) %>%
+  arrange(desc(pick(last_col())))
+
+date_cols <- setdiff(names(df), "Nom")
+
+df_num <- df  # copie des valeurs numériques
+
+for (i in seq_along(date_cols)) {
+  col      <- date_cols[i]
+  prev_col <- if (i > 1) date_cols[i - 1] else NULL
+  
+  fleche <- if (is.null(prev_col)) {
+    rep("", nrow(df))
+  } else {
+    case_when(
+      is.na(df_num[[col]])                        ~ "",
+      df_num[[col]] > df_num[[prev_col]]          ~ '<span style="color:green">▲</span>',
+      df_num[[col]] == df_num[[prev_col]]         ~ '<span style="color:purple">▶</span>',
+      df_num[[col]] < df_num[[prev_col]]          ~ '<span style="color:red">▼</span>'
+    )
+  }
+  df[[col]] <- ifelse(is.na(df_num[[col]]), NA_character_, paste(fleche, df_num[[col]]))
+}
+
+df %>%
+  kbl(escape = FALSE, align = "c", row.names = FALSE) %>%
+  kable_styling("striped", full_width = TRUE)
+```
